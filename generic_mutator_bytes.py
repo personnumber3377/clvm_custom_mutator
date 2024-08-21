@@ -43,15 +43,15 @@ def mutate_generic(string: bytes) -> str: # Mutate a string.
 
 	stuff = int.from_bytes(string, "big")
 	#print("stuff == "+str(stuff))
-	if stuff <= 500000:
+	if stuff <= 500:
 		if random.randrange(2) == 1: # Select a random integer from a range.
 			random_shit = random.randrange(MAX_SMALL_INT)
-			print("returning this: "+str(random_shit))
+			#print("returning this: "+str(random_shit))
 			random_length = min_num_bytes(random_shit)
-			print("random_length this: "+str(random_length))
+			#print("random_length this: "+str(random_length))
 			bytes_val = random_shit.to_bytes(random_length, 'big')
 			#assert isinstance(bytes_val, bytes)
-			print("returning this: "+str(bytes_val))
+			#print("returning this: "+str(bytes_val))
 			return bytes_val
 
 	strat = random.randrange(3)
