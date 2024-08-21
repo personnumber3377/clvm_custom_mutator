@@ -53,6 +53,9 @@ def get_all_paths_recursive(cur_node, current_path):
 			# print("current_path + [i] == "+str(current_path + [i]))
 			# out.append(get_all_paths_recursive(child, current_path + [i]))
 			out += get_all_paths_recursive(child, current_path + [i])
+
+
+
 	else:
 		#print("Encountered atom: "+str(cur_node.atom))
 		#print("cur_node == "+str(cur_node))
@@ -73,6 +76,7 @@ def get_all_paths(program):
 def select_random_node(program): # Select a random node from the program...
 	# Thanks to https://www.geeksforgeeks.org/select-random-node-tree-equal-probability/
 	all_paths = get_all_paths(program)
+
 	rand_path = random.choice(all_paths)
 	parent = None
 	out = program
@@ -154,6 +158,8 @@ def mutate_program(program): # Mutate the program object...
 
 	return
 
+def deinit(): # For AFL++ . AFL++ complains without this...
+	pass
 
 def custom_mutator(data, max_size, seed, native_mutator): # This is for ruzzyfork
 	# The strategy is to first decode the program to a treelike structure and then mutate this tree and then serialize the program back into bytes...
@@ -168,8 +174,10 @@ def custom_mutator(data, max_size, seed, native_mutator): # This is for ruzzyfor
 		#print("Invalid data!")
 		return data
 	# Mutate program...
-	mutate_program(new_prog)
-
+	try:
+		mutate_program(new_prog)
+	except:
+		return data
 	new_prog._cached_serialization = None # This is to get the new serialization, not the cached one.
 
 	#print("type(new_prog) == "+str(type(new_prog)))
