@@ -2,10 +2,106 @@
 
 import io
 import unittest
+import random
 
+from generic_mutator_bytes import * # For the generic mutator...
 import sys
 from parser import * # For encoding and decoding...
 from clvm_rs.program import Program
+
+
+def ashex(string: str):
+	return "".join("{:02x}".format(ord(c)) for c in string)
+
+
+'''
+
+def get_all_paths_recursive(cur_node, current_path):
+	out = [current_path]
+	for i, child in enumerate(cur_node): # Loop over all child nodes...
+		# print("current_path + [i] == "+str(current_path + [i]))
+		# out.append(get_all_paths_recursive(child, current_path + [i]))
+		out += get_all_paths_recursive(child, current_path + [i])
+	return out
+
+
+def get_all_paths(tree):
+	return get_all_paths_recursive(tree, [])
+
+
+
+
+
+
+def test_uncurry_top_level_garbage():
+    # there's garbage at the end of the top-level list
+    # `(a (q . 1) (c (q . 1) (q . 1)) (q . 0x1337))`
+    plus = Program.fromhex("ff02ffff0101ffff04ffff0101ffff010180ffff0182133780")
+    assert plus.uncurry() == (plus, None)
+
+
+
+'''
+
+
+def get_all_paths_recursive(cur_node, current_path):
+	out = [current_path]
+	if cur_node.pair:
+
+		for i, child in enumerate(cur_node.pair): # Loop over all child nodes... (new_prog.pair)
+			# print("current_path + [i] == "+str(current_path + [i]))
+			# out.append(get_all_paths_recursive(child, current_path + [i]))
+			out += get_all_paths_recursive(child, current_path + [i])
+	else:
+		#print("Encountered atom: "+str(cur_node.atom))
+		#print("cur_node == "+str(cur_node))
+		#print("cur_node.atom == "+str(cur_node.atom))
+		#print("cur_node.pair == "+str(cur_node.pair))
+		#assert cur_node.atom
+		if not cur_node.atom: # 0x80 or "nil" https://chialisp.com/clvm/#nil
+			# NOTE: This acts normally (for now) when the node is "nil" , but if this causes problems, change this behaviour to do something else in this "if not" case.
+			return out
+		return out
+	return out
+
+def get_all_paths(program):
+	#print("program.pair == "+str(program.pair[1].pair))
+	return get_all_paths_recursive(program, [])
+
+
+def select_random_node(program): # Select a random node from the program...
+	# Thanks to https://www.geeksforgeeks.org/select-random-node-tree-equal-probability/
+	all_paths = get_all_paths(program)
+	rand_path = random.choice(all_paths)
+	parent = None
+	out = program
+	for ind in rand_path:
+		parent = out
+		out = out.pair[ind]
+	return out, parent
+
+
+def isatom(node): # Returns true, if node is an atom, otherwise returns false
+	if not node.pair: # No pair... therefore atom
+		return True
+	return False # pair exists, therefore not atom
+
+def mutate_atom(node): # Mutates an atom in-place.
+	assert isatom(node) # Node should be atom.
+	node.atom = mutate_generic(node.atom) # Call the generic mutator on the atom.
+	return
+
+def mutate_program(program): # Mutate the program object...
+
+	# First get a random node to mutate, then select mutation strategy, mutate the program in-place.
+
+	rand_node = select_random_node(program)
+
+	if isatom(rand_node):
+		# Mutate atom.
+		mutate_atom(rand_node)
+
+	return
 
 
 def custom_mutator(data, max_size, seed, native_mutator): # This is for ruzzyfork
@@ -91,18 +187,35 @@ class SerializeTest(unittest.TestCase):
 	#program_obj = Program()
 
 
-	program_data = "ff32ff3c80" #  `(50 60)`
+	assert isinstance(data, bytearray)
 
+	program_data = "ff32ff3c80" #  `(50 60)`
+	print("original data: "+str(program_data))
 	new_prog = Program.fromhex(program_data)
 	print("new_prog._pair == "+str(new_prog._pair))
 	
 	print("new_prog._pair == "+str(new_prog.pair))
 	print("new_prog.atom == "+str(new_prog.atom))
 
+
+
+
+
+
+
 	print(new_prog.pair[1].pair)
 	print(new_prog.pair[0].pair)
 	print("ooffff")
 	print(new_prog.pair[0].atom)
+
+
+	# Mutate program...
+
+	#mutate_program(new_prog)
+	print("paskaaaaaaa")
+	print(list(new_prog.pair))
+
+
 	new_prog.pair[0].atom = b"aaaaaaaaaaaaaaaaa" # Modify the value to some value.
 	print(new_prog.pair[0].atom)
 	# Now print the bytes which be can get by calling "bytes" on the object.
@@ -114,10 +227,21 @@ class SerializeTest(unittest.TestCase):
 
 	stuff = bytes(new_prog)
 
-	print(stuff.hex())
 
-	assert stuff != program_data # The program should have changed.
+	print("="*20)
+	print(ashex(str(stuff.hex())))
 
+	print(ashex(str(program_data)))
+	print("="*20)
+	print("stuff: "+str(stuff.hex()))
+
+	print("program_data == "+str(program_data))
+	print("str(stuff) == str(program_data) == "+str(str(stuff) == str(program_data)))
+	if str(stuff.hex()) == str(program_data): # Check if the program got actually modified.
+		print("It is still the same!")
+		exit(1)
+
+	
 	print("Done!")
 
 	'''
