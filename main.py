@@ -95,8 +95,8 @@ def mutate_atom(node): # Mutates an atom in-place.
 def add_node(where_to_add, rand_node): # "where_to_add" is the node where we add a copy of the node "rand_node"...
 
 	if not isatom(where_to_add): # Where we add the thing is not an atom (aka a "cons pair"), so I think we can just put it there straight away...
-		print("poopoo")
-		where_to_add = rand_node #copy.deepcopy(rand_node)
+		#print("poopoo")
+		where_to_add = copy.deepcopy(rand_node) #rand_node #copy.deepcopy(rand_node)
 	else: # The node where we add is an atom...
 		return	
 
@@ -108,9 +108,9 @@ def mutate_program(program): # Mutate the program object...
 	# First get a random node to mutate, then select mutation strategy, mutate the program in-place.
 
 	rand_node, _ = select_random_node(program) # Parent is left unused
-	print("rand_node == "+str(rand_node))
-	print("rand_node.atom == "+str(rand_node.atom))
-	print("rand_node.pair == "+str(rand_node.pair))
+	# print("rand_node == "+str(rand_node))
+	# print("rand_node.atom == "+str(rand_node.atom))
+	# print("rand_node.pair == "+str(rand_node.pair))
 	if isatom(rand_node):
 		# Mutate atom.
 		mutate_atom(rand_node)
@@ -133,14 +133,14 @@ def mutate_program(program): # Mutate the program object...
 			# Add the selected node to the place which we 
 			assert where_to_add != rand_node
 			#add_node(where_to_add, rand_node) # Add the node.
-			print("FuckFuck!!!!")
-			print("where_to_add == "+str(where_to_add))
-			print("rand_node == "+str(rand_node))
+			#print("FuckFuck!!!!")
+			#print("where_to_add == "+str(where_to_add))
+			#print("rand_node == "+str(rand_node))
 
-			where_to_add = rand_node
-			print("After...")
-			print("where_to_add == "+str(where_to_add))
-			print("rand_node == "+str(rand_node))
+			where_to_add = rand_node # copy.deepcopy(rand_node)
+			#print("After...")
+			#print("where_to_add == "+str(where_to_add))
+			#print("rand_node == "+str(rand_node))
 			assert where_to_add == rand_node
 
 			return
@@ -160,8 +160,13 @@ def custom_mutator(data, max_size, seed, native_mutator): # This is for ruzzyfor
 	assert isinstance(data, bytearray) # Sanity checking...
 
 	program_data = data.hex() # Convert to hex representation
-	new_prog = Program.fromhex(program_data)
 
+	try:
+		new_prog = Program.fromhex(program_data)
+	except:
+		# Invalid program, just return the original data instead...
+		#print("Invalid data!")
+		return data
 	# Mutate program...
 	mutate_program(new_prog)
 
@@ -187,9 +192,15 @@ if __name__=="__main__":
 
 	# program_data = "ff32ff3c80"
 
-	program_data = "ff02ffff0101ffff04ffff0101ffff010180ffff0182133780"
+	# program_data = "ff02ffff0101ffff04ffff0101ffff010180ffff0182133780"
+
+
+	program_data = "aaff02ffff0101ffff04ffff0101ffff010180ffff0182133780"
+
 
 	byte_stuff = bytes.fromhex(program_data)
+
+
 
 	databytes = bytearray(byte_stuff) # Convert to bytearray as the fuzzer would pass the data to the "custom_mutator" as a bytearray...
 
