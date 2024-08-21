@@ -1,6 +1,7 @@
 
 import random
 import string as string_mod # string.printable
+import math
 
 MAX_REPEAT_COUNT = 5
 
@@ -41,13 +42,16 @@ def mutate_generic(string: bytes) -> str: # Mutate a string.
 	# First convert to integer and see if it is less than say 256
 
 	stuff = int.from_bytes(string, "big")
-
-	if stuff <= 500:
+	#print("stuff == "+str(stuff))
+	if stuff <= 500000:
 		if random.randrange(2) == 1: # Select a random integer from a range.
 			random_shit = random.randrange(MAX_SMALL_INT)
+			print("returning this: "+str(random_shit))
 			random_length = min_num_bytes(random_shit)
+			print("random_length this: "+str(random_length))
 			bytes_val = random_shit.to_bytes(random_length, 'big')
 			#assert isinstance(bytes_val, bytes)
+			print("returning this: "+str(bytes_val))
 			return bytes_val
 
 	strat = random.randrange(3)

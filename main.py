@@ -205,12 +205,12 @@ if __name__=="__main__":
 
 	BENCHMARK_COUNT = 10000
 
-	program_data = "aaff02ffff0101ffff04ffff0101ffff010180ffff0182133780"
+	program_data = "ff02ffff0101ffff04ffff0101ffff010180ffff0182133780"
 	byte_stuff = bytes.fromhex(program_data)
 	databytes = bytearray(byte_stuff) # Convert to bytearray as the fuzzer would pass the data to the "custom_mutator" as a bytearray...
 
 	for _ in range(BENCHMARK_COUNT): # Run the stuff BENCHMARK_COUNT times to get a benchmark.
-		print("oof")
+		#print("oof")
 		
 		new_data = custom_mutator(databytes, 10000000, 100, None)
 		#assert isinstance(new_data, bytearray)
