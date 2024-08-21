@@ -29,7 +29,26 @@ def add_character(string: bytes) -> str:
 	#print("oof")
 	return string[:where_to_place] + bytes([random.randrange(0,256)]) + string[where_to_place:]
 
+
+MAX_SMALL_INT = 100
+
+def min_num_bytes(integer):
+	return math.ceil(math.log(integer+1,2) / 8)
+
 def mutate_generic(string: bytes) -> str: # Mutate a string.
+
+
+	# First convert to integer and see if it is less than say 256
+
+	stuff = int.from_bytes(string, "big")
+
+	if stuff <= 500:
+		if random.randrange(2) == 1: # Select a random integer from a range.
+			random_shit = random.randrange(MAX_SMALL_INT)
+			random_length = min_num_bytes(random_shit)
+			bytes_val = random_shit.to_bytes(random_length, 'big')
+			#assert isinstance(bytes_val, bytes)
+			return bytes_val
 
 	strat = random.randrange(3)
 
